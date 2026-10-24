@@ -148,7 +148,6 @@ function briefCard(brief) {
 function indicatorTable(unit, meta, sources) {
   const info = meta.indicator_info;
   const keys = Object.keys(unit.indicators);
-  const missing = Object.keys(meta.indicator_weights).filter((k) => !(k in unit.indicators));
   return html`<details class="hs-indicators">
     <summary>All indicators</summary>
     <table>
@@ -164,6 +163,5 @@ function indicatorTable(unit, meta, sources) {
         </tr>`;
       })}</tbody>
     </table>
-    ${missing.length ? html`<p class="hs-small hs-muted">Not available ${unit.fips ? "in this build" : "at tract level"}: ${missing.map((k) => info[k].label).join(", ")}. Their weight is shared among the other indicators.</p>` : ""}
   </details>`;
 }

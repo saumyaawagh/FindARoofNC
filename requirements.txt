@@ -3,7 +3,7 @@ geopandas
 requests
 pdfplumber
 python-dotenv
-anthropic
+google-genai   # Gemini API, for the AI briefs
 pytest
 openpyxl   # reads the .xlsx court and HUD files
 pyxlsb     # reads the HUD Point-in-Time .xlsb file

@@ -102,7 +102,7 @@ FindARoofNC is an early-warning map of **housing-loss pressure** across North Ca
 ## AI disclosure
 
 - **Code:** written with Claude Code under the student's direction. The student reviewed and tested it.
-- **Briefs:** each county and tract brief is meant to be written with the Claude API from computed numbers only. The prevention actions come from a fixed list chosen by the code, and every number in a brief is checked automatically against the facts. When the API isn't used, the brief is a template built only from the numbers.
+- **Briefs:** each county and tract brief is written with Google's Gemini API from computed numbers only. The prevention actions come from a fixed list chosen by the code, and every number in a brief is checked automatically against the facts. If a brief fails the check, a template built only from the numbers is used instead.
 - **Prompt:** the exact prompt is in the repository at \`pipeline/prompts/brief_prompt.txt\`.
 
 ## Methods

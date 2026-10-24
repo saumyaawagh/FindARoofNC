@@ -249,8 +249,6 @@ const emptyPanel = html`<div class="hs-panel-inner hs-fade">
 
   <h3>Data as of</h3>
   <dl class="hs-asof">${Object.entries(meta.data_as_of).flatMap(([k, v]) => [html`<dt>${DATA_AS_OF_LABELS[k] ?? k}</dt>`, html`<dd class="num">${v}</dd>`])}</dl>
-
-  ${meta.missing_optional_sources.length ? html`<p class="hs-note">Not included in this build: ${meta.missing_optional_sources.map((id) => sources.get(id)?.name ?? id).join("; ")}. Their weight is shared among the other indicators.</p>` : ""}
 </div>`;
 ```
 

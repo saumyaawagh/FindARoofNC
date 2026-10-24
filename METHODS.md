@@ -91,10 +91,10 @@ Scores are relative: the legend always says whether the comparison is with all 1
 
 ## AI briefs
 
-- Each county and scored Durham tract can have a short brief written by Claude from a small set of computed facts: name, score, tier, rank, Momentum, Rising flag, the three driver sentences, pillar scores and the latest unemployment change. No raw data or personal information is sent.
+- Each county and scored Durham tract can have a short brief written by Google's Gemini (`gemini-3.8-flash` unless `LLM_MODEL` in `.env` names another) from a small set of computed facts: name, score, tier, rank, Momentum, Rising flag, the three driver sentences, pillar scores and the latest unemployment change. No raw data or personal information is sent.
 - **Actions are chosen in Python**, from a fixed playbook keyed to the highest-scoring pillar. The model only writes one sentence on why each action fits.
 - **Number check:** every number in a brief must appear in that unit's facts (allowing rounding to 0 or 1 decimal places, with or without "%"). The action keys must match exactly. A brief that fails is retried up to 2 times, then replaced by a template brief built only from the facts.
-- The reply must match a fixed JSON shape (structured outputs). The original plan used temperature 0.2, but the Claude API no longer accepts sampling settings such as temperature (since 2026-10-21). Consistency comes from the fixed prompt, the JSON shape and the number check instead.
+- The reply must match a fixed JSON shape (Gemini structured output), and the model runs at temperature 0.2 so briefs stay close to the facts and consistent between runs.
 - **Template briefs**, built only from the facts, are used when the API isn't available. Only briefs written by the API carry the "AI-generated brief" label.
 - The prompt is in `pipeline/prompts/brief_prompt.txt`.
 

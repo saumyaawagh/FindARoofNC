@@ -1,7 +1,7 @@
 """Run every pipeline step in order and stop at the first one that fails.
 
 Usage (from the project root):  .venv/bin/python pipeline/run_all.py
-Add --template-briefs to skip the Claude API and use template briefs (marked as fallbacks).
+Add --template-briefs to skip the Gemini API and use template briefs (marked as fallbacks).
 """
 import subprocess
 import sys

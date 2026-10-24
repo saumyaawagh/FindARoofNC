@@ -3,7 +3,7 @@
 Facts in, prose out:
   1. Python builds a small `facts` dict from the computed index (no raw data goes to the model).
   2. Python picks 2–3 prevention actions from a fixed playbook (the model never chooses them).
-  3. Claude writes the prose, as JSON, using pipeline/prompts/brief_prompt.txt.
+  3. Google's Gemini writes the prose, as JSON, using pipeline/prompts/brief_prompt.txt.
   4. Every number in the reply must appear in the facts (allowing rounding), and the action
      keys must match. Up to 2 retries; after that a template brief built only from facts is used.
 Briefs are cached by a hash of their facts, so unchanged units aren't regenerated.
@@ -18,19 +18,23 @@ import hashlib
 import json
 import os
 import re
-from concurrent.futures import ThreadPoolExecutor
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
+
+from pydantic import BaseModel
 
 import config
 import helpers  # noqa: F401  (loads .env)
 
 PROMPT_FILE = config.PIPELINE / "prompts" / "brief_prompt.txt"
 OUTPUT = config.SITE_DATA / "briefs.json"
-DEFAULT_MODEL = "claude-opus-5-5"
-# Models that accept Anthropic's server-side refusal fallback (`fallbacks: "default"`).
-FALLBACK_CAPABLE = {"claude-opus-5-5", "claude-opus-5", "claude-fable-5-1", "claude-sonnet-5-5"}
-MAX_RETRIES = 2
-WORKERS = 6
+DEFAULT_MODEL = "gemini-3.8-flash"  # used when LLM_MODEL in .env is empty
+TEMPERATURE = 0.2  # low, so briefs stay close to the facts and consistent between runs (spec §8)
+MAX_RETRIES = 2  # extra attempts when a reply fails the number check
+WORKERS = 4  # requests in flight at once; kept low for Gemini's per-minute rate limits
+RATE_LIMIT_WAITS = [10, 30, 60, 120]  # seconds to wait after "too many requests" / server errors
 TRACT_NO_CHANGE = "Change data is not available at tract level."
 
 # The fixed action playbook (spec §8). Python picks; the model only explains why.
@@ -53,32 +57,24 @@ PLAYBOOK = {
     "E": ["housing_navigation_vouchers", "utility_assistance"],
 }
 
-# The shape the model must return; structured outputs guarantee valid JSON of this shape.
-BRIEF_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "headline": {"type": "string"},
-        "situation": {"type": "string"},
-        "drivers": {"type": "array", "items": {"type": "string"}},
-        "whats_changed": {"type": "string"},
-        "actions": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "key": {"type": "string"},
-                    "label": {"type": "string"},
-                    "why": {"type": "string"},
-                },
-                "required": ["key", "label", "why"],
-                "additionalProperties": False,
-            },
-        },
-        "caveat": {"type": "string"},
-    },
-    "required": ["headline", "situation", "drivers", "whats_changed", "actions", "caveat"],
-    "additionalProperties": False,
-}
+class DailyQuotaReached(Exception):
+    """Gemini says the per-day request allowance is used up; waiting minutes won't help."""
+
+
+# The shape the model must return. Gemini's structured output fills exactly these fields.
+class Action(BaseModel):
+    key: str
+    label: str
+    why: str
+
+
+class Brief(BaseModel):
+    headline: str
+    situation: str
+    drivers: list[str]
+    whats_changed: str
+    actions: list[Action]
+    caveat: str
 
 
 # ---------------------------------------------------------------------------
@@ -226,27 +222,34 @@ def template_brief(facts, actions, kind):
 # Model call
 # ---------------------------------------------------------------------------
 def ask_model(client, model, prompt_text):
-    """One request. Returns (brief dict or None, problem string or None)."""
-    kwargs = dict(
-        model=model,
-        max_tokens=8000,
-        # Short, tightly constrained writing: low effort is enough. No `temperature`:
-        # the API no longer accepts sampling parameters (see METHODS.md).
-        output_config={"effort": "low", "format": {"type": "json_schema", "schema": BRIEF_SCHEMA}},
-        messages=[{"role": "user", "content": prompt_text}],
-    )
-    if model in FALLBACK_CAPABLE:
-        # If a safety classifier declines, Anthropic re-runs the request on another model.
-        response = client.beta.messages.create(betas=["server-side-fallback-2026-07-01"], fallbacks="default", **kwargs)
-    else:
-        response = client.messages.create(**kwargs)
+    """One request to Gemini. Returns (brief dict or None, problem string or None)."""
+    from google.genai import errors, types
 
-    if response.stop_reason in ("refusal", "max_tokens"):
-        return None, f"stop_reason={response.stop_reason}"
-    text = [b.text for b in response.content if b.type == "text"]
-    if not text:
-        return None, "no text in response"
-    return json.loads(text[-1]), None
+    config_ = types.GenerateContentConfig(
+        temperature=TEMPERATURE,
+        response_mime_type="application/json",
+        response_schema=Brief,
+        # Short, tightly constrained writing: little reasoning needed, and it's much faster.
+        thinking_config=types.ThinkingConfig(thinking_level=types.ThinkingLevel.LOW),
+    )
+    # Wait and try again on rate limits (429) and temporary server errors (5xx).
+    for wait in [*RATE_LIMIT_WAITS, None]:
+        try:
+            response = client.models.generate_content(model=model, contents=prompt_text, config=config_)
+            break
+        except errors.APIError as err:
+            # A per-day quota (the free tier allows ~20 requests a day per model) resets hours
+            # later, so stop instead of retrying.
+            if err.code == 429 and "PerDay" in str(err):
+                raise DailyQuotaReached(str(err.message)[:200]) from err
+            if wait is None or not (err.code == 429 or (err.code or 0) >= 500):
+                raise
+            time.sleep(wait)
+
+    if response.parsed is None:
+        reason = response.candidates[0].finish_reason if response.candidates else "no candidates"
+        return None, f"no usable reply (finish_reason={reason})"
+    return response.parsed.model_dump(), None
 
 
 def generate(client, model, prompt, unit_id, facts, actions, kind):
@@ -303,34 +306,58 @@ def main():
         counts["fallback"] = len(todo)
         print("Template-only run: no API calls made.")
     elif todo:
-        import anthropic
+        from google import genai
+        from google.genai import errors
 
-        if not os.getenv("ANTHROPIC_API_KEY", "").strip():
-            raise SystemExit("ANTHROPIC_API_KEY is empty in .env. Add it, or run "
+        key = os.getenv("GEMINI_API_KEY", "").strip()
+        if not key:
+            raise SystemExit("GEMINI_API_KEY is empty in .env. Add it, or run "
                              "08_briefs.py --template-only to use template briefs for now.")
-        client = anthropic.Anthropic()
+        client = genai.Client(api_key=key)
+
+        quota_hit = threading.Event()
 
         def run(job):
             unit_id, facts, actions, kind, h = job
+            if quota_hit.is_set():
+                return unit_id, facts, actions, kind, h, None, 0, ["skipped: daily quota reached"]
             try:
                 brief, retries, problems = generate(client, model, prompt, unit_id, facts, actions, kind)
-            except (anthropic.APIStatusError, anthropic.APIConnectionError, json.JSONDecodeError) as err:
+            except DailyQuotaReached as err:
+                quota_hit.set()
+                brief, retries, problems = None, 0, [f"daily quota reached: {err}"]
+            except (errors.APIError, json.JSONDecodeError, OSError) as err:
                 brief, retries, problems = None, 0, [f"{type(err).__name__}: {err}"]
             return unit_id, facts, actions, kind, h, brief, retries, problems
 
+        # Units are in rank order, so a limited quota goes to the highest-pressure places first.
+        # Briefs not done yet keep a template until they are generated.
+        for unit_id, facts, actions, kind, h in todo:
+            if unit_id not in results:
+                results[unit_id] = {**template_brief(facts, actions, kind), "model": "template",
+                                    "fallback": True, "generated_at": None, "facts_hash": h}
+
         with ThreadPoolExecutor(max_workers=WORKERS) as pool:
-            for unit_id, facts, actions, kind, h, brief, retries, problems in pool.map(run, todo):
+            futures = [pool.submit(run, job) for job in todo]
+            for future in as_completed(futures):
+                unit_id, facts, actions, kind, h, brief, retries, problems = future.result()
                 now = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
                 if brief is None:
-                    print(f"  FALLBACK {unit_id} ({facts['name']}): {problems[:2]}")
-                    brief = template_brief(facts, actions, kind)
-                    entry = {**brief, "model": "template", "fallback": True}
+                    if not problems[0].startswith("skipped"):
+                        print(f"  FALLBACK {unit_id} ({facts['name']}): {problems[0][:160]}")
+                    entry = {**template_brief(facts, actions, kind), "model": "template", "fallback": True}
                     counts["fallback"] += 1
                 else:
                     entry = {**brief, "model": model, "fallback": False}
                     counts["generated"] += 1
                     counts["retried"] += retries > 0
                 results[unit_id] = {**entry, "generated_at": now, "facts_hash": h}
+                # Save after every brief, so an interruption never loses finished AI briefs.
+                OUTPUT.write_text(json.dumps(results, separators=(",", ":"), ensure_ascii=False))
+
+        if quota_hit.is_set():
+            print(f"Gemini's daily quota for {model} was reached. {counts['fallback']} units keep a "
+                  f"template brief for now; run this step again after the quota resets to fill them in.")
 
     OUTPUT.write_text(json.dumps(results, separators=(",", ":"), ensure_ascii=False))
     print(f"Briefs: generated {counts['generated']} / cached {counts['cached']} / "

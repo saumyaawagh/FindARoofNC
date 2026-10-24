@@ -39,7 +39,7 @@ You need Python 3.12 and Node 20+.
 uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python -r requirements.txt
 
-# 2. API keys: copy the template and fill in CENSUS_API_KEY, BLS_API_KEY (and ANTHROPIC_API_KEY for AI briefs)
+# 2. API keys: copy the template and fill in CENSUS_API_KEY, BLS_API_KEY (and GEMINI_API_KEY for AI briefs)
 cp .env.example .env
 
 # 3. Hand-downloaded files: follow pipeline/manual/README.md, then check them
@@ -47,7 +47,7 @@ cp .env.example .env
 
 # 4. Run the whole pipeline (writes the JSON the site reads into site/src/data/)
 .venv/bin/python pipeline/run_all.py
-#    no Anthropic key yet? use template briefs instead:
+#    no Gemini key yet? use template briefs instead:
 .venv/bin/python pipeline/run_all.py --template-briefs
 
 # 5. Tests
@@ -63,7 +63,7 @@ npm run build                              # static site in site/dist/
 ## AI disclosure
 
 - **Code** was written with Claude Code under the student's direction. The student reviewed and tested it.
-- **Briefs** are designed to be generated with the Claude API from computed numbers only. The prevention actions come from a fixed list chosen by the code, and every number in a brief is checked automatically against the facts. If a brief fails the check, it is replaced by a template. **This build uses template briefs (no AI)**, because no API key was available when it was built. Only briefs written by the API carry an "AI-generated brief" label on the site.
+- **Briefs** are written with Google's Gemini API (`gemini-3.8-flash` by default) from computed numbers only. The prevention actions come from a fixed list chosen by the code, and every number in a brief is checked automatically against the facts; a brief that fails is retried, then replaced by a template built only from the numbers. AI-written briefs carry an "AI-generated brief" label on the site.
 - **The prompt** is in [`pipeline/prompts/brief_prompt.txt`](pipeline/prompts/brief_prompt.txt).
 
 ## Quality checks
