@@ -1,8 +1,8 @@
 # Methods
 
-HomeSignal NC turns public data on evictions, foreclosures, housing costs, jobs and structural vulnerability into a 0–100 **HomeSignal Risk Score** for each of North Carolina's 100 counties, and for census tracts in Durham County. Every indicator is ranked against its peers (counties against counties, Durham tracts against Durham tracts), grouped into five pillars, and combined with fixed weights. The score is **relative**: a county with a score of 80 shows more signs of housing-loss pressure than most other NC counties, not a fixed amount of risk. HomeSignal shows where housing-loss pressure is building. It does not identify individuals and does not predict whether any specific household will become homeless.
+FindARoofNC turns public data on evictions, foreclosures, housing costs, jobs and structural vulnerability into a 0–100 **Risk Score** for each of North Carolina's 100 counties, and for census tracts in Durham County. Every indicator is ranked against its peers (counties against counties, Durham tracts against Durham tracts), grouped into five pillars, and combined with fixed weights. The score is **relative**: a county with a score of 80 shows more signs of housing-loss pressure than most other NC counties, not a fixed amount of risk. FindARoofNC shows where housing-loss pressure is building. It does not identify individuals and does not predict whether any specific household will become homeless.
 
-> This file is the source of the website's Methods page. Lines like `{{acs_year}}` and `<!-- table:... -->` are filled in from the pipeline's output when the site is built, so the numbers on the page always match the data.
+> This file is the source of the Methods section on the website's About page. Lines like `{{acs_year}}` and `<!-- table:... -->` are filled in from the pipeline's output when the site is built, so the numbers on the page always match the data.
 
 ## How the pipeline works
 
@@ -52,7 +52,7 @@ Every indicator is oriented so that **higher = more pressure**.
 
 1. **Percentile:** each indicator is ranked among all units that have a value (0–100; the highest value gets 100). Percentile ranks aren't thrown off by extreme values, so nothing is capped.
 2. **Pillar score:** the weighted mean of the available indicator percentiles in the pillar.
-3. **HomeSignal Risk Score:** the weighted mean of the pillar scores, over the pillars that have data.
+3. **Risk Score:** the weighted mean of the pillar scores, over the pillars that have data.
 4. **Momentum** (counties only): the weighted mean of the percentiles of the change indicators: unemployment change 35, eviction change 25, foreclosure change 20, 211 change 20 (re-weighted over what's available).
 5. **Top drivers:** each indicator's share of the score. The three largest are shown as sentences built from a template, not by AI. Contributions are divided by the weight of the pillars that have data, so they add up exactly to the score.
 
@@ -94,7 +94,7 @@ Scores are relative: the legend always says whether the comparison is with all 1
 - **Actions are chosen in Python**, from a fixed playbook keyed to the highest-scoring pillar. The model only writes one sentence on why each action fits.
 - **Number check:** every number in a brief must appear in that unit's facts (allowing rounding to 0 or 1 decimal places, with or without "%"). The action keys must match exactly. A brief that fails is retried up to 2 times, then replaced by a template brief built only from the facts.
 - The reply must match a fixed JSON shape (structured outputs). The original plan used temperature 0.2, but the Claude API no longer accepts sampling settings such as temperature (since 2026-10-21). Consistency comes from the fixed prompt, the JSON shape and the number check instead.
-- **Template briefs** are used when the API isn't available. They are labelled "Template brief (no AI)" on the site, never "AI-generated".
+- **Template briefs**, built only from the facts, are used when the API isn't available. Only briefs written by the API carry the "AI-generated brief" label.
 - The prompt is in `pipeline/prompts/brief_prompt.txt`.
 
 ## Validation

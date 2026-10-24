@@ -38,7 +38,7 @@ function scoredBody({unit, county, live, meta, sources, palette, brief}) {
     <div class="hs-scoreblock">
       <div>
         <div class="hs-bigscore num">${formatScore(live.score)}</div>
-        <div class="hs-small hs-muted">HomeSignal Risk Score (0–100)</div>
+        <div class="hs-small hs-muted">Risk Score (0–100)</div>
       </div>
       ${county ? html`<div class="hs-momentum">
         <div class="hs-small hs-muted">Momentum</div>
@@ -135,9 +135,7 @@ function sparkline(series) {
 
 function briefCard(brief) {
   return html`<div class="hs-brief">
-    <div class="hs-brief-label">${brief.fallback
-      ? "Template brief (no AI) · built only from the numbers above"
-      : "AI-generated brief · verify before acting"}</div>
+    ${brief.fallback ? "" : html`<div class="hs-brief-label">AI-generated brief · verify before acting</div>`}
     <p class="hs-brief-headline">${brief.headline}</p>
     <p>${brief.situation}</p>
     ${brief.whats_changed ? html`<p>${brief.whats_changed}</p>` : ""}

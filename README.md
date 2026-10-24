@@ -1,16 +1,16 @@
-# HomeSignal NC
+# FindARoofNC
 
 **An early-warning map of housing-loss pressure across North Carolina's 100 counties, with a neighborhood-level view of Durham County.**
 
-> HomeSignal shows where housing-loss pressure is building. It does not identify individuals and does not predict whether any specific household will become homeless.
+> FindARoofNC shows where housing-loss pressure is building. It does not identify individuals and does not predict whether any specific household will become homeless.
 
-![Statewide map: counties colored by HomeSignal Risk Score, with KPI cards and the "How to read this map" panel](docs/screenshot-state.png)
+![Statewide map: counties colored by Risk Score, with KPI cards and the "How to read this map" panel](docs/screenshot-state.png)
 
 ![Durham County drill-down: census tracts colored by score, with a tract's detail panel and tooltip](docs/screenshot-durham.png)
 
 ## The problem, and who it's for
 
-Eviction prevention, rental assistance and outreach work best **before** a household loses its home. County social services departments and local governments have limited staff and money, so they need to know where pressure is building. HomeSignal combines public data on evictions, foreclosures, housing costs, jobs and structural vulnerability into one relative score per county (and per Durham census tract). It explains what drives each score and flags where pressure is **rising**.
+Eviction prevention, rental assistance and outreach work best **before** a household loses its home. County social services departments and local governments have limited staff and money, so they need to know where pressure is building. FindARoofNC combines public data on evictions, foreclosures, housing costs, jobs and structural vulnerability into one relative score per county (and per Durham census tract). It explains what drives each score and flags where pressure is **rising**.
 
 ## How it works
 
@@ -22,13 +22,13 @@ Every indicator is ranked against its peers (0–100, higher = more pressure), g
 - **D. Help-seeking (15%)**: NC 211 housing and shelter requests. *(Optional source, not in this build; its weight is shared out.)*
 - **E. Structural vulnerability (10%)**: poverty rate, share of households that rent, and two CDC Social Vulnerability Index themes. Race is deliberately **not** an input.
 
-A separate **Momentum** score, built from the change indicators, flags counties where pressure is rising. Full details: [METHODS.md](METHODS.md), or the Methods page on the site.
+A separate **Momentum** score, built from the change indicators, flags counties where pressure is rising. Full details: [METHODS.md](METHODS.md), or the Methods section of the site's About page.
 
 ## What's on the site
 
-- **Map:** a statewide choropleth with tooltips and a detail panel. The panel has pillar bars, top drivers, a 24-month unemployment trend, a brief and every indicator. There's also a Durham tract drill-down, a sortable priority watchlist, and keyboard-accessible county search.
-- **Controls:** Overall/Momentum switch, pillar-weight sliders with preset lenses, a colorblind-safe palette and CSV downloads of the scores under the current weights.
-- **Validation, Methods and About** pages.
+- **Map:** a statewide choropleth with tooltips and a detail panel. The panel has pillar bars, top drivers, a 24-month unemployment trend, a brief and every indicator. Clicking Durham County (on the map, in the watchlist or through search) opens a census-tract drill-down. There's also a sortable priority watchlist and keyboard-accessible county search.
+- **Controls:** Overall/Momentum switch, pillar-weight sliders with preset lenses, Reset view, and CSV downloads of the scores under the current weights.
+- **About** page: purpose, ethics, AI disclosure, and the full Methods (formulas, weights, tiers, sources and limitations).
 
 ## How to run it
 
@@ -63,13 +63,13 @@ npm run build                              # static site in site/dist/
 ## AI disclosure
 
 - **Code** was written with Claude Code under the student's direction. The student reviewed and tested it.
-- **Briefs** are designed to be generated with the Claude API from computed numbers only. The prevention actions come from a fixed list chosen by the code, and every number in a brief is checked automatically against the facts. If a brief fails the check, it is replaced by a template. **This build uses template briefs (no AI)**, which the site labels as such, because no API key was available when it was built.
+- **Briefs** are designed to be generated with the Claude API from computed numbers only. The prevention actions come from a fixed list chosen by the code, and every number in a brief is checked automatically against the facts. If a brief fails the check, it is replaced by a template. **This build uses template briefs (no AI)**, because no API key was available when it was built. Only briefs written by the API carry an "AI-generated brief" label on the site.
 - **The prompt** is in [`pipeline/prompts/brief_prompt.txt`](pipeline/prompts/brief_prompt.txt).
 
 ## Quality checks
 
 - 220 automated tests (`pytest`) cover the data formats, ID formats, score math, parity between the Python and browser score formulas, map file sizes and coordinates, and the brief number check.
-- Lighthouse 13.5 scores 100 for Accessibility, Best Practices and SEO on all four pages. On desktop, the map page is interactive in about 1.2 s with about 850 KB transferred.
+- Lighthouse 13.5 scores 100 for Accessibility, Best Practices and SEO on both pages (Map and About). On desktop, the map page is interactive in about 1.2 s with about 850 KB transferred.
 
 ## Limitations
 

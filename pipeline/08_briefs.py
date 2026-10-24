@@ -211,7 +211,7 @@ def template_brief(facts, actions, kind):
         changed = TRACT_NO_CHANGE
     return {
         "headline": f"{name}: {tier} housing-loss pressure",
-        "situation": (f"{name} has a HomeSignal Risk Score of {score} ({tier}), rank {facts['rank']} "
+        "situation": (f"{name} has a Risk Score of {score} ({tier}), rank {facts['rank']} "
                       f"of {facts['rank_out_of']}. Scores compare it with {facts['compared_with']}."),
         "drivers": facts["top_driver_sentences"],
         "whats_changed": changed,

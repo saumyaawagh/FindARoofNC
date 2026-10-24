@@ -6,7 +6,7 @@ const meta = JSON.parse(readFileSync(new URL("./src/data/counties.json", import.
 const dataAsOf = meta.data_as_of.unemployment;
 
 export default {
-  title: "HomeSignal NC",
+  title: "FindARoofNC",
   root: "src",
 
   // Light theme only, so the demo looks the same on every machine (no dark mode switching).
@@ -19,10 +19,10 @@ export default {
   pager: false,
   footer: `<div class="hs-footer">
   <p><strong>Aggregated public data only. No individuals are identified.</strong></p>
-  <p><a href="./methods#sources">Sources</a> · <a href="./methods">Methods</a> · <a href="./about">About</a></p>
+  <p><a href="./about">About</a> · <a href="./about#methods">Methods</a> · <a href="./about#sources">Sources</a></p>
 </div>`,
 
-  head: `<meta name="description" content="HomeSignal NC: an early-warning map of housing-loss pressure across North Carolina's 100 counties, with a Durham County neighborhood view. Built from public, aggregated data.">
+  head: `<meta name="description" content="FindARoofNC: an early-warning map of housing-loss pressure across North Carolina's 100 counties, with a Durham County neighborhood view. Built from public, aggregated data.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%231A9850'/%3E%3Cstop offset='.5' stop-color='%23FEE08B'/%3E%3Cstop offset='1' stop-color='%23D73027'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='16' height='16' rx='4' fill='url(%23g)'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,14 +44,12 @@ export default {
   header: `<div class="hs-header">
   <a class="hs-brand" href="./">
     <span class="hs-logo" aria-hidden="true"></span>
-    <span class="hs-title">HomeSignal NC</span>
+    <span class="hs-title">FindARoofNC</span>
     <span class="hs-tagline">Early-warning map of housing-loss pressure</span>
   </a>
   <div class="hs-header-right">
     <nav class="hs-nav" aria-label="Main">
       <a href="./">Map</a>
-      <a href="./validation">Validation</a>
-      <a href="./methods">Methods</a>
       <a href="./about">About</a>
     </nav>
     <span class="hs-asof-badge">Data as of ${dataAsOf}</span>

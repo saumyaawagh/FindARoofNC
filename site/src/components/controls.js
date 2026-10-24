@@ -1,5 +1,5 @@
-// Map controls (spec §7.7 and P1 features): Overall/Momentum toggle, colorblind palette toggle,
-// and the pillar-weight sliders with preset lenses.
+// Map controls (spec §7.7 and P1 features): Overall/Momentum toggle and the pillar-weight
+// sliders with preset lenses.
 // Each control is a DOM element with a `.value` that fires an "input" event when it changes,
 // so the page can read it with Framework's Generators.input(element).
 
@@ -46,22 +46,6 @@ export function createModeToggle() {
     buttons.forEach((b) => b.setAttribute("aria-disabled", String(disabled)));
   };
   return root;
-}
-
-// On/off button for the colorblind-safe (viridis) palette.
-export function createPaletteToggle() {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "hs-button";
-  button.setAttribute("aria-pressed", "false");
-  button.textContent = "◐ Colorblind-safe colors";
-  button.value = "default";
-  button.onclick = () => {
-    button.value = button.value === "default" ? "cb" : "default";
-    button.setAttribute("aria-pressed", String(button.value === "cb"));
-    emit(button);
-  };
-  return button;
 }
 
 // Shares that always add up to exactly 100% (largest-remainder rounding).

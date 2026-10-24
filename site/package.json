@@ -1,13 +1,13 @@
 {
-  "name": "homesignal-nc",
+  "name": "findaroofnc",
   "private": true,
   "type": "module",
   "scripts": {
     "clean": "rimraf src/.observablehq/cache",
-    "prebuild": "rimraf src/.observablehq/cache/methods.md",
+    "prebuild": "rimraf src/.observablehq/cache/about.md",
     "build": "observable build",
     "postbuild": "node scripts/postbuild.js",
-    "predev": "rimraf src/.observablehq/cache/methods.md",
+    "predev": "rimraf src/.observablehq/cache/about.md",
     "dev": "observable preview",
     "observable": "observable"
   },

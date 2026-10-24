@@ -9,7 +9,7 @@ import {createWatchlist, createSearch} from "./components/watchlist.js";
 import {computeScores, checkParity} from "./components/scoring.js";
 import {TIER_NAMES, colorForTierName, textOn} from "./components/palette.js";
 import {formatScore} from "./components/format.js";
-import {createWeights, createModeToggle, createPaletteToggle} from "./components/controls.js";
+import {createWeights, createModeToggle} from "./components/controls.js";
 import {downloadCSV} from "./components/csv.js";
 ```
 
@@ -51,13 +51,12 @@ const setView = (v) => (mapView.value = v);
 // Controls, built once. Their current values are read reactively in the next cell.
 const weightsControl = createWeights(meta.pillars);
 const modeToggle = createModeToggle();
-const paletteToggle = createPaletteToggle();
 ```
 
 ```js
 const weights = Generators.input(weightsControl.input); // {A: 30, B: 25, ...}
 const mode = Generators.input(modeToggle); // "overall" | "momentum"
-const palette = Generators.input(paletteToggle); // "default" | "cb"
+const palette = "default"; // the colorblind palette option was removed from the page
 ```
 
 ```js
@@ -71,7 +70,7 @@ const scoredTractCount = [...tractScores.values()].filter((s) => s.score != null
 ```
 
 ```js
-const mapEl = html`<div class="hs-map" role="region" aria-label="Map of North Carolina counties colored by HomeSignal Risk Score"></div>`;
+const mapEl = html`<div class="hs-map" role="region" aria-label="Map of North Carolina counties colored by Risk Score"></div>`;
 ```
 
 ```js
@@ -177,9 +176,6 @@ const search = createSearch({
   onSelect: focusCounty
 });
 
-const durhamButton = html`<button class="hs-button" aria-label="Zoom to Durham County census tracts">Zoom to Durham</button>`;
-durhamButton.onclick = () => focusCounty(DURHAM);
-
 const resetButton = html`<button class="hs-button" aria-label="Reset map view to all of North Carolina">Reset view</button>`;
 resetButton.onclick = () => {
   hsMap.resetView();
@@ -235,7 +231,7 @@ const topChips = scored.slice(0, 5).map((u) => {
 
 const emptyPanel = html`<div class="hs-panel-inner hs-fade">
   <h2>How to read this map</h2>
-  <p class="hs-lede">Each county's color shows its <strong>HomeSignal Risk Score</strong> (0–100), compared with the other NC counties.</p>
+  <p class="hs-lede">Each county's color shows its <strong>Risk Score</strong> (0–100), compared with the other NC counties.</p>
   <p class="hs-lede">A higher score means more signs of housing-loss pressure: eviction and foreclosure filings, rent burden, job loss and structural vulnerability.</p>
   <p class="hs-lede">Hover a county for a summary. Click it for details.</p>
 
@@ -306,7 +302,7 @@ const commonColumns = [
 ];
 
 const countyCsv = html`<button class="hs-button" aria-label="Download county scores as CSV">⬇ Counties CSV</button>`;
-countyCsv.onclick = () => downloadCSV(`homesignal_nc_counties_weights_${lensName}.csv`,
+countyCsv.onclick = () => downloadCSV(`findaroofnc_counties_weights_${lensName}.csv`,
   countyData.units.map((u) => ({...u, live: countyScores.get(u.fips)})).sort((a, b) => (a.live.rank ?? 999) - (b.live.rank ?? 999)),
   [{label: "fips", value: (u) => u.fips}, {label: "county", value: (u) => u.name}, {label: "population", value: (u) => u.population},
    ...commonColumns,
@@ -315,7 +311,7 @@ countyCsv.onclick = () => downloadCSV(`homesignal_nc_counties_weights_${lensName
    ...weightColumns]);
 
 const tractCsv = html`<button class="hs-button" aria-label="Download Durham tract scores as CSV">⬇ Durham tracts CSV</button>`;
-tractCsv.onclick = () => downloadCSV(`homesignal_durham_tracts_weights_${lensName}.csv`,
+tractCsv.onclick = () => downloadCSV(`findaroofnc_durham_tracts_weights_${lensName}.csv`,
   tractData.units.map((u) => ({...u, live: tractScores.get(u.geoid)})).sort((a, b) => (a.live.rank ?? 999) - (b.live.rank ?? 999)),
   [{label: "geoid", value: (u) => u.geoid}, {label: "tract", value: (u) => u.name}, {label: "population", value: (u) => u.population},
    ...commonColumns, ...weightColumns]);
@@ -326,16 +322,16 @@ const zeroNotice = noScores
   : html`<span></span>`;
 ```
 
-<p class="hs-positioning">HomeSignal shows where housing-loss pressure is building. It does not identify individuals and does not predict whether any specific household will become homeless.</p>
+<p class="hs-positioning">FindARoofNC shows where housing-loss pressure is building. It does not identify individuals and does not predict whether any specific household will become homeless.</p>
 
 <div>${kpis}</div>
 
 <div class="hs-controls">
-  <div class="hs-controls-group">${modeToggle}${weightsControl.lensSelect}${weightsControl.toggle}${paletteToggle}</div>
+  <div class="hs-controls-group">${modeToggle}${weightsControl.lensSelect}${weightsControl.toggle}</div>
 </div>
 <div class="hs-controls">
   <div class="hs-controls-left">${search}</div>
-  <div class="hs-controls-right">${durhamButton}${resetButton}</div>
+  <div class="hs-controls-right">${resetButton}</div>
 </div>
 
 <div>${weightsControl.drawer}</div>

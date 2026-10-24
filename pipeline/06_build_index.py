@@ -326,7 +326,7 @@ def main():
 
 
 def print_top(units, label, name_field, n=15):
-    print(f"\nTop {n} {label} by HomeSignal score")
+    print(f"\nTop {n} {label} by Risk Score")
     print(f"{'#':>3} {'name':<14} {'score':>5} {'tier':<9} {'mom.':>5} rising  drivers")
     for u in units[:n]:
         drivers = ", ".join(d["indicator"] for d in u["top_drivers"])

@@ -255,7 +255,7 @@ export function createMap(container, {countyShapes, tractShapes, invalidation}) 
         <span class="hs-pill" style="background:${color};color:${textOn(color)}">${tier ?? "No data"}</span>
         ${p.rising ? `<span class="hs-chip-rising">▲ Rising</span>` : ""}
       </div>
-      <div class="hs-tooltip-label">${momentum ? "Momentum score" : "HomeSignal Risk Score"}</div>
+      <div class="hs-tooltip-label">${momentum ? "Momentum score" : "Risk Score"}</div>
       ${p.driver ? `<div class="hs-tooltip-driver">${escape(p.driver)}</div>` : ""}
       ${p.note ? `<div class="hs-tooltip-note">${escape(p.note)}</div>` : ""}
       ${p.low_reliability ? `<div class="hs-tooltip-note">Low reliability: population under 10,000</div>` : ""}
@@ -278,7 +278,7 @@ export function createMap(container, {countyShapes, tractShapes, invalidation}) 
     const colors = PALETTES[state.palette];
     const ranges = ["0–20", "20–40", "40–60", "60–80", "80–100"];
     const durham = state.view === "durham";
-    const title = state.mode === "momentum" && !durham ? "Momentum (rising pressure)" : "HomeSignal Risk Score";
+    const title = state.mode === "momentum" && !durham ? "Momentum (rising pressure)" : "Risk Score";
     legend.innerHTML = `
       <div class="hs-legend-title">${title}</div>
       ${TIER_NAMES.map((name, i) => `
