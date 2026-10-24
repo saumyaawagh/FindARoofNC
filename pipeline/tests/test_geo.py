@@ -1,6 +1,7 @@
 """Map shapes are light enough, in the right coordinate system, and join to the index."""
 import json
 
+import pandas as pd
 import pytest
 
 import config
@@ -31,3 +32,24 @@ def test_geojson(name, budget_kb, id_field, index_file, count):
     # Every shape has a matching scored unit (joined by ID, never by name).
     index_ids = {u[id_field] for u in json.loads((config.INTERIM / index_file).read_text())}
     assert {f["properties"][id_field] for f in features} == index_ids
+
+
+def test_tract_names_match_between_map_and_index():
+    # Both come from helpers.tract_display_name, so the tooltip, panel and CSV agree.
+    shapes = json.loads((config.SITE_DATA / "durham_tracts.geojson").read_text())["features"]
+    on_map = {f["properties"]["geoid"]: f["properties"]["name"] for f in shapes}
+    in_index = {u["geoid"]: u["name"] for u in json.loads((config.INTERIM / "index_tracts.json").read_text())}
+    assert on_map == in_index
+
+
+def test_tract_names_have_neighborhood_labels():
+    table = pd.read_csv(config.INTERIM / "tract_neighborhoods.csv", dtype={"geoid": str})
+    hoods = dict(zip(table["geoid"], table["neighborhood"].fillna("")))
+    names = {u["geoid"]: u["name"] for u in json.loads((config.INTERIM / "index_tracts.json").read_text())}
+    for geoid, name in names.items():
+        assert name.startswith("Tract ")
+        if hoods.get(geoid):
+            assert name.endswith(f" · {hoods[geoid]} area"), name
+        else:
+            assert " · " not in name
+    assert names["37063000301"] == "Tract 3.01 · Walltown area"

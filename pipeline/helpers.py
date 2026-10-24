@@ -43,6 +43,24 @@ def read_acs(geo: str) -> pd.DataFrame:
     return df
 
 
+def tract_display_name(number: str, neighborhood=None) -> str:
+    """'Tract 3.01 · Walltown area', or just 'Tract 3.01' when no neighborhood touches it.
+
+    Used by both the map shapes (05) and the scored units (06), so the names always match.
+    """
+    label = f"Tract {number}"
+    if isinstance(neighborhood, str) and neighborhood:
+        label += f" · {neighborhood} area"
+    return label
+
+
+def read_tract_neighborhoods() -> dict:
+    """GEOID -> neighborhood name, from the table written by 05_build_geo.py."""
+    path = require_file(config.INTERIM / "tract_neighborhoods.csv", "tract neighborhood table from 05_build_geo.py")
+    df = pd.read_csv(path, dtype={"geoid": str})
+    return dict(zip(df["geoid"], df["neighborhood"].where(df["neighborhood"].notna(), None)))
+
+
 def _normalize_county_name(name: str) -> str:
     # "McDowell County, North Carolina" / "MCDOWELL" / "Mcdowell" -> "mcdowell"
     name = str(name).split(",")[0]

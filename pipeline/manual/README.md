@@ -45,6 +45,7 @@ The Census ACS and BLS data come from APIs (`01_fetch_acs.py`, `02_fetch_bls.py`
   git clone --depth 1 https://github.com/DataWorks-NC/durham-quality-of-life-data pipeline/raw/durham-quality-of-life-data
   ```
 - **Expected:** `config/data.js` (metric `mSUMEJECT`, "Evictions (Summary Ejectments)") and `metric/blockgroup/sumeject_numerator.csv` plus `metric/tract/sumeject_numerator.csv` with columns `fips`, `year`, `value`.
+- Also used: `selectgroups.geojson.json` (neighborhood boundaries), to label each tract with the neighborhood covering most of it, e.g. "Tract 3.01 · Walltown area".
 - Use the **numerator** files (raw counts). The Compass website maps filings *per square mile*, which is the wrong unit for us.
 - **Geography note:** the Compass uses **2010** tracts and block groups (60 tracts and 153 block groups). Only 52 of its 60 tracts match the 2020 tracts that ACS and SVI use. Its latest year is 2022. The pipeline moves the block-group counts onto 2020 tracts using the Census relationship file (see `METHODS.md`).
 

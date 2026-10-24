@@ -197,7 +197,9 @@ SOURCES = [
         "optional": False,
         "files": [RAW / "durham-quality-of-life-data" / "config" / "data.js",
                   RAW / "durham-quality-of-life-data" / "metric" / "blockgroup" / "sumeject_numerator.csv",
-                  RAW / "durham-quality-of-life-data" / "metric" / "tract" / "sumeject_numerator.csv"],
+                  RAW / "durham-quality-of-life-data" / "metric" / "tract" / "sumeject_numerator.csv",
+                  # Neighborhood boundaries, used to label tracts ("Tract 3.01 · Walltown area")
+                  RAW / "durham-quality-of-life-data" / "selectgroups.geojson.json"],
         # Raw counts (the numerator), not the per-square-mile rate the Compass website maps.
         "columns": {"sumeject_numerator.csv": ["fips", "year", "value"]},
         "used_for": "Durham eviction indicator",

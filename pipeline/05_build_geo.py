@@ -4,6 +4,10 @@ Downloads Census 2020 cartographic boundaries (1:500k) and writes:
   site/src/data/nc_counties.geojson    properties {fips, name}       budget 400 KB
   site/src/data/durham_tracts.geojson  properties {geoid, name}      budget 300 KB
 Coordinates are WGS84 (EPSG:4326, what web maps expect), simplified and rounded to 5 decimals.
+
+Also writes pipeline/interim/tract_neighborhoods.csv: for each Durham tract, the Durham
+Neighborhood Compass neighborhood that covers the largest share of it, so tracts can be shown
+as "Tract 3.01 · Walltown area".
 """
 import json
 
@@ -13,6 +17,7 @@ import requests
 import shapely
 
 import config
+from helpers import require_file, tract_display_name
 
 BASE = "https://www2.census.gov/geo/tiger/GENZ2020/shp/"
 COUNTY_ZIP = config.RAW / "cb_2020_us_county_500k.zip"
@@ -23,6 +28,8 @@ TRACT_ZIP = config.RAW / "cb_2020_37_tract_500k.zip"
 COUNTY_TOLERANCE = 0.002
 TRACT_TOLERANCE = 0.0004
 BUDGET_KB = {"nc_counties.geojson": 400, "durham_tracts.geojson": 300}
+NEIGHBORHOODS = config.RAW / "durham-quality-of-life-data" / "selectgroups.geojson.json"
+NC_STATE_PLANE = 32119  # a flat projection in meters, so areas are measured correctly
 
 
 def download(path):
@@ -53,6 +60,32 @@ def write_geojson(gdf, name):
         raise ValueError(f"{name} is over its size budget; raise its tolerance in 05_build_geo.py")
 
 
+def tract_neighborhoods(tracts):
+    """For each tract, the neighborhood covering the largest share of its area.
+
+    Every tract that touches a neighborhood gets one, even if the share is small (the
+    builder's choice); the share is kept in the table so it can be checked.
+    """
+    path = require_file(NEIGHBORHOODS, "Durham Neighborhood Compass select groups (git clone, see manual/README.md)")
+    hoods = gpd.read_file(path)
+    hoods = hoods[hoods["feature_type"] == "neighborhood"][["id", "geometry"]].to_crs(NC_STATE_PLANE)
+    hoods["geometry"] = hoods.geometry.make_valid()
+
+    t = tracts[["geoid", "geometry"]].to_crs(NC_STATE_PLANE)
+    t["tract_area"] = t.area
+    pieces = gpd.overlay(t, hoods, how="intersection", keep_geom_type=True)
+    pieces["share"] = pieces.area / pieces["tract_area"]
+    best = pieces.sort_values("share", ascending=False).drop_duplicates("geoid").set_index("geoid")
+
+    table = t[["geoid"]].copy()
+    table["neighborhood"] = table["geoid"].map(best["id"])
+    table["share"] = table["geoid"].map(best["share"]).round(4)
+    labelled = table["neighborhood"].notna().sum()
+    print(f"Neighborhood labels: {labelled} of {len(table)} tracts "
+          f"(median share of tract covered: {table['share'].median():.0%}).")
+    return table
+
+
 def main():
     config.RAW.mkdir(parents=True, exist_ok=True)
     config.SITE_DATA.mkdir(parents=True, exist_ok=True)
@@ -68,8 +101,13 @@ def main():
 
     tracts = gpd.read_file(f"zip://{TRACT_ZIP}")
     tracts = tracts[tracts["GEOID"].str.startswith(config.DURHAM_FIPS)].copy()
-    tracts["name"] = "Tract " + tracts["NAME"]
-    tracts = tracts.rename(columns={"GEOID": "geoid"})[["geoid", "name", "geometry"]]
+    tracts = tracts.rename(columns={"GEOID": "geoid"})
+    hoods = tract_neighborhoods(tracts)
+    config.INTERIM.mkdir(parents=True, exist_ok=True)
+    hoods.to_csv(config.INTERIM / "tract_neighborhoods.csv", index=False)
+    by_geoid = dict(zip(hoods["geoid"], hoods["neighborhood"]))
+    tracts["name"] = [tract_display_name(n, by_geoid.get(g)) for n, g in zip(tracts["NAME"], tracts["geoid"])]
+    tracts = tracts[["geoid", "name", "geometry"]]
     write_geojson(simplify(tracts.sort_values("geoid"), TRACT_TOLERANCE), "durham_tracts.geojson")
 
 

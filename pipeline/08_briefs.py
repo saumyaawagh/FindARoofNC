@@ -210,7 +210,9 @@ def template_brief(facts, actions, kind):
     else:
         changed = TRACT_NO_CHANGE
     return {
-        "headline": f"{name}: {tier} housing-loss pressure",
+        # Tracts use the short "Tract 3.01" form: long neighborhood names could push the headline
+        # past 12 words, and the full name is already the panel's title.
+        "headline": f"{name.split(' · ')[0] if kind == 'tract' else name}: {tier} housing-loss pressure",
         "situation": (f"{name} has a Risk Score of {score} ({tier}), rank {facts['rank']} "
                       f"of {facts['rank_out_of']}. Scores compare it with {facts['compared_with']}."),
         "drivers": facts["top_driver_sentences"],

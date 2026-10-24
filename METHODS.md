@@ -87,6 +87,7 @@ Scores are relative: the legend always says whether the comparison is with all 1
 - ACS ({{acs_year}}) and SVI 2022 use the **2020** census tracts (68 in Durham County).
 - The Durham Neighborhood Compass eviction counts use **2010** geography: 60 tracts and 153 block groups. In the input check, only 52 of its 60 tract IDs matched a 2020 tract (87%), below the 95% needed to join directly. So each 2010 block group's count is split across the 2020 tracts it overlaps, in proportion to shared land area, using the Census Bureau's 2020↔2010 block group relationship file. As a check, the tracts that kept their 2010 ID come out within 0.4 filings of the Compass's own tract counts on average. Tracts that were split in 2020 are estimates.
 - Map shapes are the Census Bureau's 2020 cartographic boundary files, simplified for the web.
+- **Tract labels** (for example "Tract 3.01 · Walltown area") name the Durham Neighborhood Compass neighborhood that covers the largest share of each tract's area. Neighborhood boundaries cover mostly the city, so for some outer tracts the named neighborhood covers only a small part of the tract. Treat "area" as a rough pointer, not a boundary.
 
 ## AI briefs
 

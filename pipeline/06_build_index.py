@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 import config
-from helpers import read_acs, require_file
+from helpers import read_acs, read_tract_neighborhoods, require_file, tract_display_name
 
 # Labels, units and display rules for each indicator live in config.INDICATOR_INFO.
 INDICATORS = config.INDICATOR_INFO
@@ -154,8 +154,10 @@ def tract_indicators():
         "renter_share": "acs", "unemployment_rate": "acs",
         "svi_household": "svi", "svi_housing_transport": "svi",
     }
-    # "Census Tract 17.07; Durham County; North Carolina" -> "Tract 17.07"
-    names = "Tract " + acs["NAME"].str.extract(r"Census Tract ([\d.]+)")[0]
+    # "Census Tract 3.01; Durham County; North Carolina" -> "Tract 3.01 · Walltown area"
+    numbers = acs["NAME"].str.extract(r"Census Tract ([\d.]+)")[0]
+    hoods = read_tract_neighborhoods()
+    names = pd.Series({g: tract_display_name(n, hoods.get(g)) for g, n in numbers.items()})
     return ind, acs["population"], names, vintage, source
 
 
