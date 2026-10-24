@@ -1,0 +1,23 @@
+{
+  "name": "homesignal-nc",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "rimraf src/.observablehq/cache",
+    "prebuild": "rimraf src/.observablehq/cache/methods.md",
+    "build": "observable build",
+    "postbuild": "node scripts/postbuild.js",
+    "predev": "rimraf src/.observablehq/cache/methods.md",
+    "dev": "observable preview",
+    "observable": "observable"
+  },
+  "dependencies": {
+    "@observablehq/framework": "1.13.4"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

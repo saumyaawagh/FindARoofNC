@@ -1,0 +1,29 @@
+# Secrets
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Pipeline downloads (re-fetchable)
+pipeline/raw/
+
+# Large court spreadsheets are re-downloadable from nccourts.gov (see pipeline/manual/README.md)
+pipeline/manual/civil_issues_*.xlsx
+
+# Site
+node_modules/
+site/dist/
+site/src/.observablehq/cache/
+.observablehq/cache/
+
+# OS
+.DS_Store
+
+# Local preview config (points at a machine-specific temp folder)
+.claude/launch.json
+
+# Cleaned tables passed between pipeline steps (rebuilt by run_all.py)
+pipeline/interim/
