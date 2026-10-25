@@ -320,8 +320,6 @@ const zeroNotice = noScores
   : html`<span></span>`;
 ```
 
-<p class="hs-positioning">FindARoofNC shows where housing-loss pressure is building. It does not identify individuals and does not predict whether any specific household will become homeless.</p>
-
 <div>${kpis}</div>
 
 <div class="hs-controls">

@@ -57,8 +57,9 @@ PLAYBOOK = {
     "E": ["housing_navigation_vouchers", "utility_assistance"],
 }
 
-class DailyQuotaReached(Exception):
-    """Gemini says the per-day request allowance is used up; waiting minutes won't help."""
+class GeminiStopped(Exception):
+    """Gemini won't accept more requests for now (daily quota used up, or no billing credit).
+    Retrying in a few minutes won't help, so the run stops calling the API."""
 
 
 # The shape the model must return. Gemini's structured output fills exactly these fields.
@@ -239,9 +240,9 @@ def ask_model(client, model, prompt_text):
             break
         except errors.APIError as err:
             # A per-day quota (the free tier allows ~20 requests a day per model) resets hours
-            # later, so stop instead of retrying.
-            if err.code == 429 and "PerDay" in str(err):
-                raise DailyQuotaReached(str(err.message)[:200]) from err
+            # later, and 402 means the project's prepaid credit is used up: stop, don't retry.
+            if err.code == 402 or (err.code == 429 and "PerDay" in str(err)):
+                raise GeminiStopped(f"{err.code}: {str(err.message)[:160]}") from err
             if wait is None or not (err.code == 429 or (err.code or 0) >= 500):
                 raise
             time.sleep(wait)
@@ -323,9 +324,9 @@ def main():
                 return unit_id, facts, actions, kind, h, None, 0, ["skipped: daily quota reached"]
             try:
                 brief, retries, problems = generate(client, model, prompt, unit_id, facts, actions, kind)
-            except DailyQuotaReached as err:
+            except GeminiStopped as err:
                 quota_hit.set()
-                brief, retries, problems = None, 0, [f"daily quota reached: {err}"]
+                brief, retries, problems = None, 0, [f"Gemini stopped: {err}"]
             except (errors.APIError, json.JSONDecodeError, OSError) as err:
                 brief, retries, problems = None, 0, [f"{type(err).__name__}: {err}"]
             return unit_id, facts, actions, kind, h, brief, retries, problems
@@ -356,8 +357,8 @@ def main():
                 OUTPUT.write_text(json.dumps(results, separators=(",", ":"), ensure_ascii=False))
 
         if quota_hit.is_set():
-            print(f"Gemini's daily quota for {model} was reached. {counts['fallback']} units keep a "
-                  f"template brief for now; run this step again after the quota resets to fill them in.")
+            print(f"Gemini stopped accepting requests (daily quota or billing credit). {counts['fallback']} units "
+                  f"keep a template brief for now; run this step again once that is resolved to fill them in.")
 
     OUTPUT.write_text(json.dumps(results, separators=(",", ":"), ensure_ascii=False))
     print(f"Briefs: generated {counts['generated']} / cached {counts['cached']} / "
