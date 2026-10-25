@@ -164,18 +164,6 @@ SOURCES = [
         "used_for": "Structural vulnerability pillar",
     },
     {
-        "id": "nc211",
-        "name": "NC 211 Counts (housing & shelter requests)",
-        "publisher": "United Way of North Carolina / NC 211",
-        "url": "https://www.nc211.org/data",
-        "geography": "county, ZIP",
-        "kind": "manual",
-        "optional": True,
-        "files": [MANUAL / "211_county.csv", MANUAL / "211_zip.csv"],
-        "columns": {},  # set once a real export has been inspected
-        "used_for": "Help-seeking pillar",
-    },
-    {
         "id": "zori",
         "name": "Zillow Observed Rent Index (county, monthly)",
         "publisher": "Zillow Research",
@@ -285,15 +273,16 @@ SOURCES = [
 ]
 
 # ---------------------------------------------------------------------------
-# Index weights (spec §4.4). Pillar weights sum to 100; indicator weights inside a
+# Index weights (spec §4.4, minus the Help-seeking pillar, removed because no 211 data was
+# available). The four pillar weights keep their original values and add up to 85; scores
+# use each pillar's share of that total (30/85 ≈ 35%, and so on). Indicator weights inside a
 # pillar add up to that pillar's weight.
 # ---------------------------------------------------------------------------
 PILLARS = {
     "A": {"label": "Displacement pressure", "weight": 30},
     "B": {"label": "Housing cost pressure", "weight": 25},
     "C": {"label": "Economic shock", "weight": 20},
-    "D": {"label": "Help-seeking", "weight": 15},
-    "E": {"label": "Structural vulnerability", "weight": 10},
+    "D": {"label": "Structural vulnerability", "weight": 10},
 }
 
 INDICATOR_WEIGHTS = {
@@ -305,12 +294,10 @@ INDICATOR_WEIGHTS = {
     "rent_growth": {"pillar": "B", "weight": 5},
     "unemployment_rate": {"pillar": "C", "weight": 10},
     "unemployment_change": {"pillar": "C", "weight": 10},
-    "requests_211_rate": {"pillar": "D", "weight": 10},
-    "requests_211_change": {"pillar": "D", "weight": 5},
-    "poverty_rate": {"pillar": "E", "weight": 4},
-    "renter_share": {"pillar": "E", "weight": 2},
-    "svi_household": {"pillar": "E", "weight": 2},
-    "svi_housing_transport": {"pillar": "E", "weight": 2},
+    "poverty_rate": {"pillar": "D", "weight": 4},
+    "renter_share": {"pillar": "D", "weight": 2},
+    "svi_household": {"pillar": "D", "weight": 2},
+    "svi_housing_transport": {"pillar": "D", "weight": 2},
 }
 
 # How each indicator is named and shown. "short" is used in tight spots like the watchlist.
@@ -324,8 +311,6 @@ INDICATOR_INFO = {
     "rent_growth":           {"label": "Rent growth", "short": "Rent growth", "unit": "% change in 12 months", "decimals": 1, "signed": True},
     "unemployment_rate":     {"label": "Unemployment rate", "short": "Unemployment", "unit": "%", "decimals": 1},
     "unemployment_change":   {"label": "Change in unemployment", "short": "Unemployment change", "unit": "percentage points", "decimals": 1, "signed": True},
-    "requests_211_rate":     {"label": "211 housing requests", "short": "211 requests", "unit": "per 1,000 renter households", "decimals": 1},
-    "requests_211_change":   {"label": "Change in 211 housing requests", "short": "211 change", "unit": "per 1,000 renter households", "decimals": 1, "signed": True},
     "poverty_rate":          {"label": "Poverty rate", "short": "Poverty", "unit": "%", "decimals": 1},
     "renter_share":          {"label": "Households that rent", "short": "Renter share", "unit": "% of households", "decimals": 1},
     "svi_household":         {"label": "SVI household characteristics", "short": "SVI household", "unit": "percentile", "decimals": 0},
@@ -337,7 +322,6 @@ MOMENTUM_WEIGHTS = {
     "unemployment_change": 35,
     "eviction_change": 25,
     "foreclosure_change": 20,
-    "requests_211_change": 20,
 }
 
 TIERS = [

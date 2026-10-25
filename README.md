@@ -14,13 +14,14 @@ Eviction prevention, rental assistance and outreach work best **before** a house
 
 ## How it works
 
-Every indicator is ranked against its peers (0–100, higher = more pressure), grouped into five pillars, and combined with adjustable weights:
+Every indicator is ranked against its peers (0–100, higher = more pressure), grouped into four pillars, and combined with adjustable weights (each pillar's share is its weight out of 85):
 
-- **A. Displacement pressure (30%)**: eviction filings, foreclosure filings, and the change in eviction filings.
-- **B. Housing cost pressure (25%)**: renters paying 50%+ of income on rent, and the housing wage gap (2-bedroom rent vs. typical renter income).
-- **C. Economic shock (20%)**: unemployment rate and its change from a year earlier.
-- **D. Help-seeking (15%)**: NC 211 housing and shelter requests. *(Optional source, not in this build; its weight is shared out.)*
-- **E. Structural vulnerability (10%)**: poverty rate, share of households that rent, and two CDC Social Vulnerability Index themes. Race is deliberately **not** an input.
+- **A. Displacement pressure (weight 30, ≈35%)**: eviction filings, foreclosure filings, and the change in eviction filings.
+- **B. Housing cost pressure (weight 25, ≈29%)**: renters paying 50%+ of income on rent, and the housing wage gap (2-bedroom rent vs. typical renter income).
+- **C. Economic shock (weight 20, ≈24%)**: unemployment rate and its change from a year earlier.
+- **D. Structural vulnerability (weight 10, ≈12%)**: poverty rate, share of households that rent, and two CDC Social Vulnerability Index themes. Race is deliberately **not** an input.
+
+A fifth pillar, *Help-seeking* (NC 211 calls for housing help), was planned but removed because that data wasn't available.
 
 A separate **Momentum** score, built from the change indicators, flags counties where pressure is rising. Full details: [METHODS.md](METHODS.md), or the Methods section of the site's About page.
 
@@ -77,8 +78,8 @@ npm run build                              # static site in site/dist/
 - Durham's neighborhood eviction data is from 2022 and uses 2010 boundaries; it is crosswalked to 2020 tracts (see Methods).
 - Small counties have noisy rates; they carry a "Low reliability" badge.
 - Scores are **relative** to other NC counties (or Durham tracts), not absolute levels of risk.
-- 211 requests reflect help-seeking, which also depends on awareness and access.
-- Two optional sources (NC 211, Zillow rents) and both validation sources (student homelessness, HUD Point-in-Time counts) are not in this build.
+- There is no help-seeking data (NC 211 calls), which could give earlier warning.
+- The optional Zillow rent source and both validation sources (student homelessness, HUD Point-in-Time counts) are not in this build.
 
 ## Roadmap
 

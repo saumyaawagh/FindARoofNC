@@ -243,7 +243,8 @@ def build(ind, population, names, vintage, source, peers, id_field, with_momentu
     pillars, pillar_cov, used = pillar_scores(pct[scored_indicators])
     pillar_w = {k: v["weight"] for k, v in config.PILLARS.items()}
     score = overall_score(pillars, pillar_w).round(2)
-    coverage = used.sum(axis=1) / 100
+    # Share of all indicator weight that had data (the weights add up to 85 now, not 100).
+    coverage = used.sum(axis=1) / sum(w["weight"] for w in config.INDICATOR_WEIGHTS.values())
     rank = score.rank(ascending=False, method="min")
     momentum = momentum_score(pct) if with_momentum else None
     weight_of_present_pillars = pillars.notna().mul(pd.Series(pillar_w)).sum(axis=1)

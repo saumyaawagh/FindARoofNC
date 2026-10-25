@@ -3,13 +3,14 @@
 // Each control is a DOM element with a `.value` that fires an "input" event when it changes,
 // so the page can read it with Framework's Generators.input(element).
 
-// Pillar weights in the order A–E (Displacement, Cost, Economic, Help-seeking, Structural).
+// Pillar weights in the order A–D (Displacement, Cost, Economic, Structural). The Help-seeking
+// pillar was removed (no 211 data); each lens is its old setting without that pillar's slider.
 export const LENSES = {
-  default: {label: "Default", weights: [30, 25, 20, 15, 10]},
-  eviction: {label: "Eviction lens", weights: [50, 20, 10, 10, 10]},
-  cost: {label: "Cost-burden lens", weights: [20, 45, 15, 10, 10]},
-  economic: {label: "Economic-shock lens", weights: [20, 15, 45, 10, 10]},
-  balanced: {label: "Balanced", weights: [20, 20, 20, 20, 20]}
+  default: {label: "Default", weights: [30, 25, 20, 10]},
+  eviction: {label: "Eviction lens", weights: [50, 20, 10, 10]},
+  cost: {label: "Cost-burden lens", weights: [20, 45, 15, 10]},
+  economic: {label: "Economic-shock lens", weights: [20, 15, 45, 10]},
+  balanced: {label: "Balanced", weights: [25, 25, 25, 25]}
 };
 
 function emit(target) {

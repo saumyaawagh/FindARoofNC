@@ -21,7 +21,8 @@ def test_meta_block(label, data, id_field):
     for key in ["generated_at", "acs_year", "pillars", "indicator_weights", "tiers", "missing_optional_sources"]:
         assert key in meta, f"{label} meta is missing {key}"
     assert meta["generated_at"].endswith("Z")
-    assert sum(p["weight"] for p in meta["pillars"].values()) == 100
+    assert len(meta["pillars"]) == 4
+    assert sum(p["weight"] for p in meta["pillars"].values()) == 85
 
 
 @pytest.mark.parametrize("label,data,id_field", BOTH)

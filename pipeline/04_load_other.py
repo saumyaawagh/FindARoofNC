@@ -151,11 +151,6 @@ def main():
         (config.INTERIM / "zori_county.csv").unlink(missing_ok=True)
         print("ZORI: optional, not present.")
 
-    if (config.MANUAL / "211_county.csv").exists():
-        # The 211 export format hasn't been seen yet, so there's no loader to trust.
-        raise SystemExit("211_county.csv is present, but its loader hasn't been written yet. "
-                         "Ask Claude to inspect the export and add it to 04_load_other.py.")
-    print("NC 211: optional, not present.")
 
     (config.INTERIM / "other_meta.json").write_text(json.dumps(meta, indent=2))
 

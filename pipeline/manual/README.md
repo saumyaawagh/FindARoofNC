@@ -53,33 +53,27 @@ The Census ACS and BLS data come from APIs (`01_fetch_acs.py`, `02_fetch_bls.py`
 
 ## Optional (sources)
 
-### 6. NC 211 housing & shelter requests → `211_county.csv`, `211_zip.csv` ⚠️ missing
-- **Where:** https://www.nc211.org/data (links to the "211 Counts" dashboard).
-- **Click:** filter to the *Housing & Shelter* need category. Pick the last 15 months, group by **county**, and export to CSV. Repeat grouped by **ZIP code**.
-- **Expected:** a geography column (county name or ZIP), a date or month column, and a request count. Exact column names will be set once a real export has been inspected.
-- If the dashboard has no export button, leave this optional and missing. Pillar D (help-seeking) will then be blank, and its weight is shared out.
-
-### 7. Zillow Observed Rent Index → `zori_county.csv` ⚠️ missing
+### 6. Zillow Observed Rent Index → `zori_county.csv` ⚠️ missing
 - **Where:** https://www.zillow.com/research/data/
 - **Click:** "Rentals" section → Data type *ZORI (Smoothed): All Homes Plus Multifamily Time Series ($)* → Geography *County* → Download.
 - **Expected:** `RegionName`, `StateName`, `StateCodeFIPS`, `MunicipalCodeFIPS`, then one column per month (`2025-09-30`, …). Zillow only covers some counties, mostly metro ones.
 
 ## Optional (validation only)
 
-### 8. Homeless students enrolled → `student_homeless_lea.csv` ⚠️ missing
+### 7. Homeless students enrolled → `student_homeless_lea.csv` ⚠️ missing
 - **Where:** https://eddataexpress.ed.gov/ → Download → Data download tool.
 - **Click:** Program *Education for Homeless Children and Youth* → data group "Homeless students enrolled" (EDFacts file 118) → State *North Carolina* → Level *LEA* (school district) → the latest **2** school years → CSV.
-- **Needs:** item 9.
+- **Needs:** item 8.
 
-### 9. School district → county crosswalk → `lea_county_crosswalk.csv` (hand-built; needed only with item 8)
-- **Columns:** `lea_name` (exactly as written in item 8), `county_fips` (5-digit string).
-- City school districts (e.g. Asheville City Schools) map to the county they sit in. Claude can draft this from the LEA list once item 8 is downloaded. You then check it.
+### 8. School district → county crosswalk → `lea_county_crosswalk.csv` (hand-built; needed only with item 7)
+- **Columns:** `lea_name` (exactly as written in item 7), `county_fips` (5-digit string).
+- City school districts (e.g. Asheville City Schools) map to the county they sit in. Claude can draft this from the LEA list once item 7 is downloaded. You then check it.
 
-### 10. HUD Point-in-Time counts by CoC → `pit_by_coc.xlsb` ⚠️ missing
+### 9. HUD Point-in-Time counts by CoC → `pit_by_coc.xlsb` ⚠️ missing
 - **Where:** https://www.huduser.gov/portal/datasets/ahar.html → AHAR data files.
 - **Click:** "2007–2025 Point-in-Time Estimates by CoC" (.xlsb). Use the 2007–2024 file if 2025 isn't posted.
-- **Needs:** item 11.
+- **Needs:** item 10.
 
-### 11. County → CoC crosswalk → `coc_county_crosswalk.csv` (hand-built; needed only with item 10)
+### 10. County → CoC crosswalk → `coc_county_crosswalk.csv` (hand-built; needed only with item 9)
 - **Columns:** `county_fips`, `coc_code` (e.g. `NC-502`), `coc_name`.
 - NC has 12 CoCs; the Balance of State CoC (`NC-503`) covers 79 counties. Check every row against HUD's published CoC geography before using it.

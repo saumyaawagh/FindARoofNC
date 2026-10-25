@@ -19,9 +19,11 @@ All of this runs in Python on a laptop. The website only re-weights the five pil
 
 ## Pillars and weights
 
+There are four pillars. A fifth, *Help-seeking* (NC 211 requests for housing help, weight 15), was planned but removed because no 211 data was available. The four pillar weights add up to 85, and each pillar counts in proportion to its weight: Displacement 30/85 ≈ 35%, Housing cost 25/85 ≈ 29%, Economic shock 20/85 ≈ 24%, Structural vulnerability 10/85 ≈ 12%.
+
 <!-- table:weights -->
 
-Inside a pillar, each indicator's weight is shared out over the indicators that have data. If a pillar has no data at all, it's left out and the other pillars' weights are scaled up to fill the gap. Weight that can't be used is reported as **coverage** (for example, 80% means 80 of the 100 weight points had data).
+Inside a pillar, each indicator's weight is shared out over the indicators that have data. If a pillar has no data at all, it's left out and the other pillars' weights are scaled up to fill the gap. The share of the 85 weight points that had data is reported as **coverage** (for example, 80 of 85 points = 94%).
 
 Not available in this build: {{missing_optional}}.
 
@@ -53,7 +55,7 @@ Every indicator is oriented so that **higher = more pressure**.
 1. **Percentile:** each indicator is ranked among all units that have a value (0–100; the highest value gets 100). Percentile ranks aren't thrown off by extreme values, so nothing is capped.
 2. **Pillar score:** the weighted mean of the available indicator percentiles in the pillar.
 3. **Risk Score:** the weighted mean of the pillar scores, over the pillars that have data.
-4. **Momentum** (counties only): the weighted mean of the percentiles of the change indicators: unemployment change 35, eviction change 25, foreclosure change 20, 211 change 20 (re-weighted over what's available).
+4. **Momentum** (counties only): the weighted mean of the percentiles of the change indicators: unemployment change 35, eviction change 25, foreclosure change 20 (re-weighted over what's available).
 5. **Top drivers:** each indicator's share of the score. The three largest are shown as sentences built from a template, not by AI. Contributions are divided by the weight of the pillars that have data, so they add up exactly to the score.
 
 ## Tiers
@@ -66,7 +68,7 @@ Scores are relative: the legend always says whether the comparison is with all 1
 
 - **Rising:** Momentum 75 or higher **and** score 40 or higher. The score condition stops a low-pressure county that moved a little from being flagged.
 - **Low reliability:** population under 10,000. Rates in small counties swing a lot from year to year, so they get a badge instead of being hidden. This build: {{low_reliability_counties}}. Every Durham tract is under 10,000 people by design, so this badge isn't used for tracts.
-- **Partial data:** coverage under 70%. Durham tracts can reach at most 52% coverage, because there is no tract-level foreclosure, eviction-change, housing-wage-gap, unemployment-change or 211 data. Every scored tract therefore carries this badge.
+- **Partial data:** coverage under 70%. Durham tracts can reach at most 61% coverage (52 of 85 weight points), because there is no tract-level foreclosure, eviction-change, housing-wage-gap or unemployment-change data. Every scored tract therefore carries this badge.
 
 ## What's left out, and why
 
@@ -77,7 +79,7 @@ Scores are relative: the legend always says whether the comparison is with all 1
 ## Missing data
 
 - **Never filled in.** Missing values stay missing. They are never replaced with zeros, averages or estimates.
-- **Optional sources** (NC 211 requests, Zillow rents, and the two validation sources) may be absent. Their weight is shared among the other indicators, and the site says so.
+- **Optional sources** (Zillow rents and the two validation sources) may be absent. Their weight is shared among the other indicators, and the site says so.
 - **October 2025 unemployment:** BLS published no county estimates for October 2025 ("Data unavailable due to the 2025 lapse in appropriations"). That month is left blank, and the sparkline shows a gap.
 - **Durham tracts with no households:** Tracts 15.01 and 15.03 (Duke's campus) have residents but no households, because everyone lives in group quarters such as dorms. Tract 98.01 has no residents. The index measures pressure on households, so these tracts are not scored and show as "No data". Without this rule, Tract 15.03 would rank first in Durham on a single indicator (student unemployment).
 
@@ -114,5 +116,5 @@ Scores are relative: the legend always says whether the comparison is with all 1
 - **Validation geography doesn't match.** School districts and homelessness Continuums of Care don't line up with county borders, so those comparisons are rough.
 - **Small counties** have noisy rates. Watch the Low reliability badge.
 - **Scores are relative.** A low score means less pressure than other NC counties, not no pressure.
-- **211 calls reflect help-seeking,** which also depends on whether people know about 211 and can reach it, not only on need.
+- **No help-seeking data.** Calls to NC 211 for housing help would be an early signal, but that data wasn't available, so it isn't part of the score.
 - **Briefs** are generated from the numbers and checked automatically, but should still be read critically before acting on them.

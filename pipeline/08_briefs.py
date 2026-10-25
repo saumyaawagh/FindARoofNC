@@ -47,14 +47,12 @@ ACTION_LABELS = {
     "landlord_mediation": "Landlord mediation",
     "workforce_services": "Workforce & re-employment services",
     "utility_assistance": "Utility assistance",
-    "outreach_and_intake_capacity": "Outreach & intake capacity",
 }
 PLAYBOOK = {
     "A": ["eviction_diversion", "tenant_legal_aid", "foreclosure_counseling"],
     "B": ["emergency_rental_assistance", "housing_navigation_vouchers", "landlord_mediation"],
     "C": ["workforce_services", "emergency_rental_assistance", "utility_assistance"],
-    "D": ["outreach_and_intake_capacity", "emergency_rental_assistance"],
-    "E": ["housing_navigation_vouchers", "utility_assistance"],
+    "D": ["housing_navigation_vouchers", "utility_assistance"],  # structural vulnerability
 }
 
 class GeminiStopped(Exception):
