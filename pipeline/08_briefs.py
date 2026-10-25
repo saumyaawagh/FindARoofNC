@@ -248,7 +248,18 @@ def ask_model(client, model, prompt_text):
     if response.parsed is None:
         reason = response.candidates[0].finish_reason if response.candidates else "no candidates"
         return None, f"no usable reply (finish_reason={reason})"
-    return response.parsed.model_dump(), None
+    return without_em_dashes(response.parsed.model_dump()), None
+
+
+def without_em_dashes(value):
+    """The site uses no em dashes; replace any the model writes with a comma."""
+    if isinstance(value, str):
+        return value.replace(" — ", ", ").replace("—", ", ")
+    if isinstance(value, list):
+        return [without_em_dashes(v) for v in value]
+    if isinstance(value, dict):
+        return {k: without_em_dashes(v) for k, v in value.items()}
+    return value
 
 
 def generate(client, model, prompt, unit_id, facts, actions, kind):

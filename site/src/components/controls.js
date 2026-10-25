@@ -133,7 +133,7 @@ export function createWeights(pillars) {
     const allZero = list.every((w) => w === 0);
     notice.textContent = allZero
       ? "Set at least one weight above 0."
-      : lens === "default" ? "" : "Custom weights — scores and ranks recomputed.";
+      : lens === "default" ? "" : "Custom weights: scores and ranks recomputed.";
     notice.classList.toggle("hs-notice-warn", allZero);
   }
 

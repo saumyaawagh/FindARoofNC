@@ -159,7 +159,7 @@ const highestCard = top
       <div class="hs-kpi-value num">${top.name} ${formatScore(top.score)}</div>
       <div class="hs-kpi-sub">Click to select</div>
     </button>`
-  : kpiCard("Highest score", "—");
+  : kpiCard("Highest score", "N/A");
 if (top) highestCard.onclick = () => focusCounty(top.fips);
 
 const kpis = html`<div class="hs-kpis">

@@ -1,11 +1,11 @@
 // Number and date formatting used across the site, so every page shows numbers the same way.
 
 export function formatScore(score) {
-  return score == null ? "—" : Math.round(score).toString();
+  return score == null ? "N/A" : Math.round(score).toString();
 }
 
 export function formatNumber(value, decimals = 0) {
-  if (value == null) return "—";
+  if (value == null) return "N/A";
   return value.toLocaleString("en-US", {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
 }
 
@@ -24,7 +24,7 @@ export function ordinal(n) {
 // An indicator value as a short string, e.g. "9.8", "+0.4", "4.1%", "85th".
 // info = meta.indicator_info[key] from counties.json: {decimals, signed, unit}
 export function formatIndicator(value, info) {
-  if (value == null) return "—";
+  if (value == null) return "N/A";
   if (info.unit === "percentile") return ordinal(value);
   const text = value.toLocaleString("en-US", {
     minimumFractionDigits: info.decimals,

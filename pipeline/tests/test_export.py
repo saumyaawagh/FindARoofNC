@@ -101,3 +101,9 @@ def test_missing_optional_sources_are_reported_consistently():
 def test_total_site_data_is_small():
     total = sum(p.stat().st_size for p in DATA.iterdir() if p.is_file())
     assert total < 1.5 * 1024 * 1024, "site data should stay well under the 2.5 MB page budget"
+
+
+@pytest.mark.parametrize("name", ["counties.json", "durham_tracts.json", "briefs.json", "sources.json", "validation.json"])
+def test_no_em_dashes_in_site_data(name):
+    # The site uses no em dashes (builder's style choice); driver sentences use commas instead.
+    assert "—" not in (DATA / name).read_text(encoding="utf-8")

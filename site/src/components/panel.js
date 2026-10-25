@@ -158,7 +158,7 @@ function indicatorTable(unit, meta, sources) {
         return html`<tr>
           <td>${info[key].label}<div class="hs-small hs-muted">${src ? html`<a href="${src.url}" target="_blank" rel="noopener">${src.publisher}</a>` : ind.source}</div></td>
           <td class="num">${formatIndicator(ind.value, info[key])}<div class="hs-small hs-muted">${info[key].unit === "%" ? "" : info[key].unit}</div></td>
-          <td class="num">${ind.pct == null ? "—" : Math.round(ind.pct)}</td>
+          <td class="num">${ind.pct == null ? "N/A" : Math.round(ind.pct)}</td>
           <td class="hs-small">${ind.vintage}</td>
         </tr>`;
       })}</tbody>

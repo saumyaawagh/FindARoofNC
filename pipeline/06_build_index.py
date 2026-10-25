@@ -231,7 +231,7 @@ def driver_sentence(key, value, values: pd.Series, peers: str):
     # "Higher than X% of NC counties" = share of the *other* units with a lower value.
     others = values.dropna()
     share = (others < value).sum() / max(len(others) - 1, 1) * 100
-    return f"{INDICATORS[key]['label']}: {format_value(key, value)} — higher than {share:.0f}% of {peers}."
+    return f"{INDICATORS[key]['label']}: {format_value(key, value)}, higher than {share:.0f}% of {peers}."
 
 
 # ---------------------------------------------------------------------------

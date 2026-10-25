@@ -85,16 +85,16 @@ export function createWatchlist({onSelect, palette = "default"}) {
     const tr = document.createElement("tr");
     tr.tabIndex = 0;
     tr.dataset.id = r.fips;
-    tr.setAttribute("aria-label", `${r.name} County, rank ${r.rank ?? "—"}, score ${formatScore(r.score)}`);
+    tr.setAttribute("aria-label", `${r.name} County, rank ${r.rank ?? "N/A"}, score ${formatScore(r.score)}`);
     if (r.fips === state.selectedId) tr.className = "hs-selected";
     const color = colorForTierName(r.tier, state.palette);
     tr.innerHTML = `
-      <td class="num hs-col-rank">${r.rank ?? "—"}</td>
+      <td class="num hs-col-rank">${r.rank ?? "N/A"}</td>
       <td class="hs-col-name">${r.name}</td>
       <td class="num hs-col-score"><span class="hs-scorecell">${formatScore(r.score)}<span class="hs-minibar"><span style="width:${r.score ?? 0}%;background:${color}"></span></span></span></td>
       <td class="hs-col-tier"><span class="hs-pill" style="background:${color};color:${textOn(color)}">${r.tier ?? "No data"}</span></td>
       <td class="num hs-col-momentum">${formatScore(r.momentum)}${r.rising ? ` <span class="hs-rising-mark" title="Rising">▲</span>` : ""}</td>
-      <td class="hs-col-driver">${r.driver ?? "—"}</td>
+      <td class="hs-col-driver">${r.driver ?? "N/A"}</td>
       <td class="num hs-col-coverage">${Math.round(r.coverage * 100)}%${r.partial ? ` <span title="Partial data: under 70% of indicator weight available" aria-label="partial data">⚠</span>` : ""}</td>`;
     tr.onclick = () => onSelect(r.fips);
     tr.onkeydown = (e) => {

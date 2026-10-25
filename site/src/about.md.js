@@ -44,7 +44,7 @@ function sourcesTable() {
   for (const s of sources) {
     const name = s.url ? `[${s.name}](${s.url})` : s.name;
     const status = s.status === "used" ? `Yes (retrieved ${s.retrieved})` : "Not included (optional)";
-    rows.push(`| ${name} | ${s.publisher} | ${s.geography} | ${s.vintage ?? "—"} | ${s.used_for} | ${status} |`);
+    rows.push(`| ${name} | ${s.publisher} | ${s.geography} | ${s.vintage ?? "N/A"} | ${s.used_for} | ${status} |`);
   }
   return rows.join("\n");
 }
