@@ -59,8 +59,19 @@ const values = {
 };
 const tables = {weights: weightsTable(), tiers: tiersTable(), sources: sourcesTable()};
 
+// Sections of METHODS.md that stay in the repo docs but are not shown on the About page.
+const HIDDEN_SECTIONS = ["What's left out, and why"];
+
+function withoutSection(text, heading) {
+  // Remove "### heading" and everything up to the next "### " heading.
+  const start = text.indexOf(`### ${heading}\n`);
+  if (start === -1) throw new Error(`METHODS.md has no section "${heading}"`);
+  const next = text.indexOf("\n### ", start + 1);
+  return text.slice(0, start) + (next === -1 ? "" : text.slice(next + 1));
+}
+
 // METHODS.md becomes one section of this page, so each of its headings moves down a level.
-const methodsSection = methods
+let methodsSection = methods
   .replace(/^# Methods\n/, "")
   .replace(/^> This file is the source[^\n]*\n/m, "")
   .replace(/^## /gm, "### ")
@@ -72,6 +83,7 @@ const methodsSection = methods
     if (!(name in values)) throw new Error(`METHODS.md uses unknown value {{${name}}}`);
     return values[name];
   });
+for (const heading of HIDDEN_SECTIONS) methodsSection = withoutSection(methodsSection, heading);
 
 process.stdout.write(`---
 title: About
@@ -85,45 +97,16 @@ title: About
 
 FindARoofNC is an early-warning map of **housing-loss pressure** across North Carolina's 100 counties, with a neighborhood-level view of Durham County. It is built for county **social services departments and local governments** deciding where to focus eviction prevention, rental assistance and outreach, ideally *before* a lost home turns into homelessness.
 
-## What it is, and what it isn't
-
-**FindARoofNC shows where housing-loss pressure is building. It does not identify individuals and does not predict whether any specific household will become homeless.**
-
-- It **is** a relative ranking of places, built from public, aggregated data and updated when new data is published.
-- It **isn't** a list of people, a risk score for households, or a forecast of homelessness counts.
-
 ## Ethics
 
 - **Aggregated public data only.** Every number describes a whole county or census tract. No individual or household data is used.
-- **Race is not an input.** CDC's racial and ethnic minority theme is deliberately excluded (see [What's left out, and why](#whats-left-out-and-why)).
+- **Race is not an input.** CDC's racial and ethnic minority theme is deliberately excluded.
 - **Careful wording.** The highest tier is called "Priority", meaning a place to look first, not "dangerous" or "bad".
 - **Honest about limits.** Missing data is shown as missing, small counties carry a "Low reliability" badge, and the [Validation](#validation) notes below report how stable the ranking is when the weights change.
-
-## AI disclosure
-
-- **Code:** written with Claude Code under the student's direction. The student reviewed and tested it.
-- **Briefs:** each county and tract brief is written with Google's Gemini API from computed numbers only. The prevention actions come from a fixed list chosen by the code, and every number in a brief is checked automatically against the facts. If a brief fails the check, a template built only from the numbers is used instead.
-- **Prompt:** the exact prompt is in the repository at \`pipeline/prompts/brief_prompt.txt\`.
 
 ## Methods
 
 ${methodsSection}
-
-## Roadmap
-
-Ideas for later versions, not part of this build:
-
-- Comparing two counties side by side
-- Congressional district overlay
-- Print to PDF
-- Backtesting the index against past years
-- 60-day outlook
-- Shelter capacity gap
-- Hurricane Helene recovery overlay
-- Spanish-language version
-- Directory of local resources
-- Live chat
-- Automatic data refresh
 
 ## Credits
 

@@ -29,7 +29,7 @@ A separate **Momentum** score, built from the change indicators, flags counties 
 
 - **Map:** a statewide choropleth with tooltips and a detail panel. The panel has pillar bars, top drivers, a 24-month unemployment trend, a brief and every indicator. Clicking Durham County (on the map, in the watchlist or through search) opens a census-tract drill-down. There's also a sortable priority watchlist and keyboard-accessible county search.
 - **Controls:** Overall/Momentum switch, pillar-weight sliders with preset lenses, Reset view, and CSV downloads of the scores under the current weights.
-- **About** page: purpose, ethics, AI disclosure, and the full Methods (formulas, weights, tiers, sources and limitations).
+- **About** page: purpose, ethics, and the Methods (formulas, weights, tiers, sources and limitations).
 
 ## How to run it
 
