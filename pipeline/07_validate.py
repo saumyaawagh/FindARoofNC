@@ -57,14 +57,14 @@ def student_check(counties):
         return missing("student_homeless")
     # The ED Data Express export hasn't been seen yet; write this once its columns are known.
     raise SystemExit("student_homeless_lea.csv is present, but its validation code hasn't been written yet. "
-                     "Ask Claude to inspect the file and finish student_check() in 07_validate.py.")
+                     "Inspect the file and finish student_check() in 07_validate.py.")
 
 
 def pit_check(counties):
     if not (config.MANUAL / "pit_by_coc.xlsb").exists():
         return missing("hud_pit")
     raise SystemExit("pit_by_coc.xlsb is present, but its validation code hasn't been written yet. "
-                     "Ask Claude to inspect the file and finish pit_check() in 07_validate.py.")
+                     "Inspect the file and finish pit_check() in 07_validate.py.")
 
 
 def stability_check(counties):

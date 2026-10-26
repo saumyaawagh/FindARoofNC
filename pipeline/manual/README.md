@@ -67,7 +67,7 @@ The Census ACS and BLS data come from APIs (`01_fetch_acs.py`, `02_fetch_bls.py`
 
 ### 8. School district → county crosswalk → `lea_county_crosswalk.csv` (hand-built; needed only with item 7)
 - **Columns:** `lea_name` (exactly as written in item 7), `county_fips` (5-digit string).
-- City school districts (e.g. Asheville City Schools) map to the county they sit in. Claude can draft this from the LEA list once item 7 is downloaded. You then check it.
+- City school districts (e.g. Asheville City Schools) map to the county they sit in. Draft this from the LEA list once item 7 is downloaded, then check every row.
 
 ### 9. HUD Point-in-Time counts by CoC → `pit_by_coc.xlsb` ⚠️ missing
 - **Where:** https://www.huduser.gov/portal/datasets/ahar.html → AHAR data files.

@@ -63,7 +63,6 @@ npm run build                              # static site in site/dist/
 
 ## AI disclosure
 
-- **Code** was written with Claude Code under the student's direction. The student reviewed and tested it.
 - **Briefs** are written with Google's Gemini API (`gemini-3.8-flash` by default) from computed numbers only. The prevention actions come from a fixed list chosen by the code, and every number in a brief is checked automatically against the facts; a brief that fails is retried, then replaced by a template built only from the numbers. AI-written briefs carry an "AI-generated brief" label on the site.
 - **The prompt** is in [`pipeline/prompts/brief_prompt.txt`](pipeline/prompts/brief_prompt.txt).
 
